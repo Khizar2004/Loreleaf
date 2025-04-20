@@ -35,6 +35,11 @@ export const createLinkSchema = z.object({
   targetLeafId: z.string().uuid(),
 });
 
+// Leaf Link Schema
+export const linkLeafSchema = z.object({
+  linkedLeafIds: z.array(z.string().uuid()),
+});
+
 // Filter Schemas
 export const leafFilterSchema = z.object({
   tags: z.array(z.string()).optional(),

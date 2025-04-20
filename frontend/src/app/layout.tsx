@@ -23,7 +23,7 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col bg-gray-50">
             <Navbar />
             <main className="flex-grow container mx-auto py-6 px-4">
-              {children}
+        {children}
             </main>
             <footer className="bg-gray-100 border-t py-4">
               <div className="container mx-auto px-4 text-center text-gray-600">

@@ -398,4 +398,145 @@ export const leafService = {
       growthByMonth,
     };
   },
+
+  // Link a leaf to other leaves
+  async linkLeaf(sourceLeafId: string, userId: string, targetLeafIds: string[]) {
+    // Check if leaf exists and belongs to user
+    const leaf = await prisma.leaf.findFirst({
+      where: {
+        id: sourceLeafId,
+        userId,
+      },
+    });
+
+    if (!leaf) {
+      throw new Error('Leaf not found');
+    }
+
+    // Create links
+    const createdLinks = await this.createLinks(sourceLeafId, targetLeafIds);
+
+    return {
+      sourceLeaf: { id: leaf.id, title: leaf.title },
+      linkedLeaves: createdLinks.length,
+    };
+  },
+
+  // Export all leaves for a user
+  async exportLeaves(userId: string) {
+    // Get all leaves with their links
+    const leaves = await prisma.leaf.findMany({
+      where: { userId },
+      include: {
+        linkedTo: {
+          include: {
+            targetLeaf: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+        linkedFrom: {
+          include: {
+            sourceLeaf: {
+              select: {
+                id: true,
+                title: true,
+              },
+            },
+          },
+        },
+      },
+    });
+
+    // Transform to a more exportable format
+    return leaves.map(leaf => ({
+      id: leaf.id,
+      title: leaf.title,
+      content: leaf.content,
+      tags: leaf.tags,
+      createdAt: leaf.createdAt,
+      updatedAt: leaf.updatedAt,
+      forwardLinks: leaf.linkedTo.map(link => ({
+        id: link.targetLeaf.id,
+        title: link.targetLeaf.title,
+      })),
+      backLinks: leaf.linkedFrom.map(link => ({
+        id: link.sourceLeaf.id,
+        title: link.sourceLeaf.title,
+      })),
+    }));
+  },
+
+  // Import leaves for a user
+  async importLeaves(userId: string, importData: any) {
+    // Validate the import data structure
+    if (!Array.isArray(importData)) {
+      throw new Error('Import data must be an array of leaves');
+    }
+
+    // Create transaction for all database operations
+    return prisma.$transaction(async (tx) => {
+      // Map to track old IDs to new IDs
+      const idMap = new Map<string, string>();
+      
+      // First create all leaves (without links)
+      for (const leafData of importData) {
+        const { title, content, tags } = leafData;
+        
+        if (!title || !content) {
+          throw new Error('All leaves must have a title and content');
+        }
+        
+        const newLeaf = await tx.leaf.create({
+          data: {
+            title,
+            content,
+            tags: Array.isArray(tags) ? tags : [],
+            userId,
+          },
+        });
+        
+        // Store mapping from old ID to new ID
+        idMap.set(leafData.id, newLeaf.id);
+      }
+      
+      // Now create links between leaves using the new IDs
+      const links = [];
+      for (const leafData of importData) {
+        if (leafData.forwardLinks && Array.isArray(leafData.forwardLinks)) {
+          const sourceId = idMap.get(leafData.id);
+          if (!sourceId) continue;
+          
+          for (const link of leafData.forwardLinks) {
+            const targetId = idMap.get(link.id);
+            if (!targetId || sourceId === targetId) continue;
+            
+            // Check if link already exists to avoid duplicates
+            const existingLink = links.some(
+              l => l.sourceId === sourceId && l.targetId === targetId
+            );
+            
+            if (!existingLink) {
+              links.push({ sourceId, targetId });
+              
+              await tx.leafLink.create({
+                data: {
+                  sourceLeafId: sourceId,
+                  targetLeafId: targetId,
+                },
+              });
+            }
+          }
+        }
+      }
+      
+      return {
+        importedLeaves: importData.length,
+        createdLinks: links.length,
+      };
+    });
+  },
 }; 
