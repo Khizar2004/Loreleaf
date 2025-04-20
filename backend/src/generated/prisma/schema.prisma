@@ -1,0 +1,52 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Looking for ways to speed up your queries, or scale easily with your serverless or edge functions?
+// Try Prisma Accelerate: https://pris.ly/cli/accelerate-init
+
+generator client {
+  provider = "prisma-client-js"
+  output   = "../src/generated/prisma"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(uuid())
+  email     String   @unique
+  password  String
+  name      String?
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  leaves    Leaf[]
+}
+
+model Leaf {
+  id        String   @id @default(uuid())
+  title     String
+  content   String
+  tags      String[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+  userId    String
+  user      User     @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  // Links
+  linkedTo   LeafLink[] @relation("SourceLeaf")
+  linkedFrom LeafLink[] @relation("TargetLeaf")
+}
+
+model LeafLink {
+  id           String   @id @default(uuid())
+  sourceLeafId String
+  targetLeafId String
+  createdAt    DateTime @default(now())
+
+  sourceLeaf Leaf @relation("SourceLeaf", fields: [sourceLeafId], references: [id], onDelete: Cascade)
+  targetLeaf Leaf @relation("TargetLeaf", fields: [targetLeafId], references: [id], onDelete: Cascade)
+
+  @@unique([sourceLeafId, targetLeafId])
+}
