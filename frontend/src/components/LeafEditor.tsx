@@ -7,6 +7,11 @@ import { zodResolver } from '@hookform/resolvers/zod';
 import ReactMarkdown from 'react-markdown';
 import leafService, { Leaf } from '@/services/apiService';
 import { useRouter } from 'next/navigation';
+import { motion, AnimatePresence } from 'framer-motion';
+import { Button } from './ui/button';
+import { Card, CardContent } from './ui/card';
+import { Check, ChevronLeft, Eye, EyeOff, Save, Tag, Link as LinkIcon, X } from 'lucide-react';
+import { cn } from '@/lib/utils';
 
 // Define validation schema
 const leafSchema = z.object({
@@ -48,6 +53,7 @@ const LeafEditor: React.FC<LeafEditorProps> = ({ leafId, existingLeaf }) => {
   });
 
   const contentValue = watch('content');
+  const titleValue = watch('title');
 
   // Fetch available leaves for linking
   useEffect(() => {
@@ -116,130 +122,187 @@ const LeafEditor: React.FC<LeafEditorProps> = ({ leafId, existingLeaf }) => {
   };
 
   return (
-    <div>
-      <div className="mb-6 flex justify-between items-center">
-        <h1 className="text-2xl font-bold text-gray-800">
-          {isEditMode ? 'Edit Leaf' : 'Create New Leaf'}
-        </h1>
-        <button
-          type="button"
+    <motion.div
+      initial={{ opacity: 0, y: 20 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.5 }}
+      className="space-y-6"
+    >
+      <header className="flex items-center justify-between">
+        <div className="flex items-center">
+          <Button 
+            variant="ghost" 
+            size="icon" 
+            onClick={() => router.push('/dashboard')}
+            className="mr-2"
+          >
+            <ChevronLeft className="h-5 w-5" />
+            <span className="sr-only">Back</span>
+          </Button>
+          <h1 className="text-3xl font-bold tracking-tight gradient-text">
+            {isEditMode ? 'Edit Leaf' : 'Create New Leaf'}
+          </h1>
+        </div>
+        <Button
+          variant="outline"
+          size="sm"
           onClick={() => setPreview(!preview)}
-          className="bg-gray-200 hover:bg-gray-300 text-gray-800 py-2 px-4 rounded-md transition"
+          className="gap-1.5"
         >
+          {preview ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
           {preview ? 'Edit' : 'Preview'}
-        </button>
-      </div>
+        </Button>
+      </header>
 
-      {error && (
-        <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
-          {error}
-        </div>
-      )}
+      <AnimatePresence initial={false} mode="wait">
+        {error && (
+          <motion.div 
+            initial={{ opacity: 0, y: -10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0 }}
+            className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
+          >
+            {error}
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {preview ? (
-        <div className="bg-white rounded-lg shadow-md p-6">
-          <h2 className="text-2xl font-bold mb-4">{watch('title')}</h2>
-          <div className="prose max-w-none">
-            <ReactMarkdown>{contentValue}</ReactMarkdown>
-          </div>
-        </div>
-      ) : (
-        <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
-          <div>
-            <label htmlFor="title" className="block text-gray-700 font-medium mb-2">
-              Title
-            </label>
-            <input
-              id="title"
-              type="text"
-              {...register('title')}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="Enter a title for your leaf"
-            />
-            {errors.title && (
-              <p className="text-red-500 text-sm mt-1">{errors.title.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="content" className="block text-gray-700 font-medium mb-2">
-              Content (Markdown)
-            </label>
-            <textarea
-              id="content"
-              {...register('content')}
-              rows={10}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500 font-mono"
-              placeholder="Write your content in Markdown..."
-            />
-            {errors.content && (
-              <p className="text-red-500 text-sm mt-1">{errors.content.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label htmlFor="tags" className="block text-gray-700 font-medium mb-2">
-              Tags (comma-separated)
-            </label>
-            <input
-              id="tags"
-              type="text"
-              {...register('tags')}
-              className="w-full px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-              placeholder="tech, notes, ideas"
-            />
-            {errors.tags && (
-              <p className="text-red-500 text-sm mt-1">{errors.tags.message}</p>
-            )}
-          </div>
-
-          <div>
-            <label className="block text-gray-700 font-medium mb-2">
-              Link to Other Leaves
-            </label>
-            {availableLeaves.length === 0 ? (
-              <p className="text-gray-500 italic">
-                No other leaves available to link.
-              </p>
-            ) : (
-              <div className="max-h-60 overflow-y-auto border rounded-md p-2">
-                {availableLeaves.map((leaf) => (
-                  <div key={leaf.id} className="flex items-center p-2 hover:bg-gray-50">
-                    <input
-                      type="checkbox"
-                      id={`leaf-${leaf.id}`}
-                      checked={selectedLinks.includes(leaf.id)}
-                      onChange={() => handleLinkToggle(leaf.id)}
-                      className="mr-2"
-                    />
-                    <label htmlFor={`leaf-${leaf.id}`} className="cursor-pointer">
-                      {leaf.title}
-                    </label>
-                  </div>
-                ))}
+      <AnimatePresence initial={false} mode="wait">
+        {preview ? (
+          <motion.div
+            key="preview"
+            initial={{ opacity: 0, x: 20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: -20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <Card className="overflow-hidden">
+              <CardContent className="p-0">
+                <div className="prose max-w-none p-6">
+                  <h1>{titleValue || 'Untitled Leaf'}</h1>
+                  <ReactMarkdown>{contentValue || 'No content yet'}</ReactMarkdown>
+                </div>
+              </CardContent>
+            </Card>
+          </motion.div>
+        ) : (
+          <motion.div
+            key="editor"
+            initial={{ opacity: 0, x: -20 }}
+            animate={{ opacity: 1, x: 0 }}
+            exit={{ opacity: 0, x: 20 }}
+            transition={{ duration: 0.3 }}
+          >
+            <form onSubmit={handleSubmit(onSubmit)} className="space-y-6">
+              <div className="space-y-2">
+                <label htmlFor="title" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Title
+                </label>
+                <input
+                  id="title"
+                  type="text"
+                  {...register('title')}
+                  className={cn(
+                    "flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50",
+                    errors.title && "border-destructive focus-visible:ring-destructive"
+                  )}
+                  placeholder="Enter a title for your leaf"
+                />
+                {errors.title && (
+                  <p className="text-sm text-destructive">{errors.title.message}</p>
+                )}
               </div>
-            )}
-          </div>
 
-          <div className="flex gap-4">
-            <button
-              type="button"
-              onClick={() => router.push('/dashboard')}
-              className="bg-gray-300 hover:bg-gray-400 text-gray-800 py-2 px-4 rounded-md transition"
-            >
-              Cancel
-            </button>
-            <button
-              type="submit"
-              disabled={loading}
-              className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md transition disabled:opacity-50 disabled:cursor-not-allowed"
-            >
-              {loading ? 'Saving...' : isEditMode ? 'Update Leaf' : 'Create Leaf'}
-            </button>
-          </div>
-        </form>
-      )}
-    </div>
+              <div className="space-y-2">
+                <label htmlFor="content" className="text-sm font-medium leading-none peer-disabled:cursor-not-allowed peer-disabled:opacity-70">
+                  Content (Markdown)
+                </label>
+                <textarea
+                  id="content"
+                  {...register('content')}
+                  rows={12}
+                  className="flex w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50 font-mono"
+                  placeholder="Write your content in Markdown..."
+                />
+                {errors.content && (
+                  <p className="text-sm text-destructive">{errors.content.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label htmlFor="tags" className="text-sm font-medium leading-none flex items-center gap-1.5">
+                  <Tag className="h-4 w-4" /> Tags (comma-separated)
+                </label>
+                <input
+                  id="tags"
+                  type="text"
+                  {...register('tags')}
+                  className="flex h-10 w-full rounded-md border border-input bg-background px-3 py-2 text-sm ring-offset-background file:border-0 file:bg-transparent file:text-sm file:font-medium placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:cursor-not-allowed disabled:opacity-50"
+                  placeholder="tech, notes, ideas"
+                />
+                {errors.tags && (
+                  <p className="text-sm text-destructive">{errors.tags.message}</p>
+                )}
+              </div>
+
+              <div className="space-y-2">
+                <label className="text-sm font-medium leading-none flex items-center gap-1.5">
+                  <LinkIcon className="h-4 w-4" /> Link to Other Leaves
+                </label>
+                {availableLeaves.length === 0 ? (
+                  <p className="text-sm text-muted-foreground italic">
+                    No other leaves available to link.
+                  </p>
+                ) : (
+                  <div className="max-h-60 overflow-y-auto rounded-md border p-2">
+                    {availableLeaves.map((leaf) => (
+                      <div key={leaf.id} className="flex items-center my-1.5 px-2">
+                        <button
+                          type="button"
+                          onClick={() => handleLinkToggle(leaf.id)}
+                          className={cn(
+                            "flex h-8 w-full items-center gap-2 rounded-md px-2 text-sm transition-colors hover:bg-accent hover:text-accent-foreground",
+                            selectedLinks.includes(leaf.id) && "bg-primary/10"
+                          )}
+                        >
+                          <div className="flex h-4 w-4 items-center justify-center rounded-sm border border-primary/40">
+                            {selectedLinks.includes(leaf.id) && (
+                              <Check className="h-3 w-3 text-primary" />
+                            )}
+                          </div>
+                          <span className="truncate">{leaf.title}</span>
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="flex justify-between pt-4">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={() => router.push('/dashboard')}
+                  className="flex items-center gap-1.5"
+                >
+                  <X className="h-4 w-4" />
+                  Cancel
+                </Button>
+                <Button
+                  type="submit"
+                  variant="gradient"
+                  disabled={loading}
+                  className="gap-1.5 shadow-md"
+                >
+                  <Save className="h-4 w-4" />
+                  {loading ? 'Saving...' : isEditMode ? 'Update Leaf' : 'Create Leaf'}
+                </Button>
+              </div>
+            </form>
+          </motion.div>
+        )}
+      </AnimatePresence>
+    </motion.div>
   );
 };
 

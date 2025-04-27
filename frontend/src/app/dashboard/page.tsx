@@ -3,8 +3,13 @@
 import { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
+import { motion } from 'framer-motion';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import leafService, { Leaf, FilterParams } from '@/services/apiService';
+import { Button } from '@/components/ui/button';
+import { Card, CardContent, CardFooter, CardHeader, CardTitle } from '@/components/ui/card';
+import { Search, PlusCircle, Trash2, Edit, Tag, Calendar } from 'lucide-react';
+import { formatDate, truncateText } from '@/lib/utils';
 
 export default function DashboardPage() {
   const [leaves, setLeaves] = useState<Leaf[]>([]);
@@ -48,104 +53,161 @@ export default function DashboardPage() {
     }
   };
 
+  const container = {
+    hidden: { opacity: 0 },
+    show: {
+      opacity: 1,
+      transition: {
+        staggerChildren: 0.1
+      }
+    }
+  };
+
+  const item = {
+    hidden: { opacity: 0, y: 20 },
+    show: { opacity: 1, y: 0, transition: { type: 'spring', stiffness: 300, damping: 24 } }
+  };
+
   return (
     <ProtectedRoute>
-      <div>
-        <div className="flex justify-between items-center mb-8">
-          <h1 className="text-2xl font-bold text-gray-800">Your Leaves</h1>
-          <Link 
-            href="/leaf/new" 
-            className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md shadow transition"
-          >
-            New Leaf
+      <motion.div
+        initial={{ opacity: 0, y: 20 }}
+        animate={{ opacity: 1, y: 0 }}
+        transition={{ duration: 0.5 }}
+        className="space-y-8"
+      >
+        <header className="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+          <h1 className="text-3xl font-bold tracking-tight gradient-text">Your Leaves</h1>
+          <Link href="/leaf/new">
+            <Button variant="gradient" size="sm" className="shadow-md flex items-center gap-1">
+              <PlusCircle className="h-4 w-4" />
+              <span>New Leaf</span>
+            </Button>
           </Link>
-        </div>
+        </header>
 
-        <div className="mb-6">
-          <form onSubmit={handleSearch} className="flex gap-2">
-            <input
-              type="text"
-              value={searchTerm}
-              onChange={(e) => setSearchTerm(e.target.value)}
-              placeholder="Search leaves..."
-              className="flex-grow px-4 py-2 border rounded-md focus:outline-none focus:ring-2 focus:ring-emerald-500"
-            />
-            <button
-              type="submit"
-              className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-md shadow transition"
-            >
-              Search
-            </button>
-          </form>
-        </div>
+        <form onSubmit={handleSearch} className="relative">
+          <Search className="absolute left-3 top-1/2 h-4 w-4 -translate-y-1/2 text-muted-foreground" />
+          <input
+            type="text"
+            value={searchTerm}
+            onChange={(e) => setSearchTerm(e.target.value)}
+            placeholder="Search leaves..."
+            className="w-full rounded-lg border bg-background px-10 py-2 text-sm ring-offset-background placeholder:text-muted-foreground focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2"
+          />
+          <Button 
+            type="submit" 
+            size="sm" 
+            variant="ghost" 
+            className="absolute right-1 top-1/2 -translate-y-1/2 h-7"
+          >
+            Search
+          </Button>
+        </form>
 
         {error && (
-          <div className="bg-red-100 border border-red-400 text-red-700 px-4 py-3 rounded mb-4">
+          <motion.div 
+            initial={{ opacity: 0, height: 0 }}
+            animate={{ opacity: 1, height: 'auto' }}
+            exit={{ opacity: 0, height: 0 }}
+            className="rounded-lg border border-destructive/50 bg-destructive/10 p-4 text-sm text-destructive"
+          >
             {error}
-          </div>
+          </motion.div>
         )}
 
         {loading ? (
-          <div className="flex justify-center my-12">
-            <div className="animate-spin rounded-full h-12 w-12 border-t-2 border-b-2 border-emerald-500"></div>
+          <div className="flex h-52 items-center justify-center">
+            <motion.div
+              animate={{ rotate: 360 }}
+              transition={{ repeat: Infinity, duration: 2, ease: 'linear' }}
+              className="h-8 w-8 rounded-full border-2 border-primary border-t-transparent"
+            />
           </div>
         ) : leaves.length === 0 ? (
-          <div className="bg-gray-100 rounded-lg p-6 text-center">
-            <p className="text-gray-600 mb-4">You don't have any leaves yet.</p>
-            <Link 
-              href="/leaf/new" 
-              className="text-emerald-600 hover:text-emerald-700 font-medium"
-            >
-              Create your first leaf
+          <motion.div
+            initial={{ opacity: 0, scale: 0.9 }}
+            animate={{ opacity: 1, scale: 1 }}
+            className="flex h-52 flex-col items-center justify-center rounded-lg border border-dashed p-8 text-center"
+          >
+            <div className="rounded-full bg-primary/10 p-3">
+              <PlusCircle className="h-6 w-6 text-primary" />
+            </div>
+            <h3 className="mt-4 text-lg font-medium">No leaves found</h3>
+            <p className="mb-4 mt-2 text-sm text-muted-foreground">
+              Create your first leaf to start organizing your knowledge
+            </p>
+            <Link href="/leaf/new">
+              <Button variant="gradient" size="sm">
+                Create your first leaf
+              </Button>
             </Link>
-          </div>
+          </motion.div>
         ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+          <motion.div
+            variants={container}
+            initial="hidden"
+            animate="show"
+            className="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3"
+          >
             {leaves.map((leaf) => (
-              <div 
-                key={leaf.id} 
-                className="bg-white rounded-lg shadow-md overflow-hidden flex flex-col"
-              >
-                <div className="p-6 flex-grow">
-                  <h3 className="text-xl font-bold text-gray-800 mb-2 truncate">
-                    {leaf.title}
-                  </h3>
-                  <p className="text-gray-600 mb-4 line-clamp-3">
-                    {leaf.content}
-                  </p>
-                  <div className="flex flex-wrap gap-2 mb-4">
-                    {leaf.tags.map((tag) => (
-                      <span 
-                        key={tag} 
-                        className="bg-emerald-100 text-emerald-800 text-xs px-2 py-1 rounded-full"
-                      >
-                        {tag}
-                      </span>
-                    ))}
-                  </div>
-                  <p className="text-gray-500 text-sm">
-                    {new Date(leaf.updatedAt).toLocaleDateString()}
-                  </p>
-                </div>
-                <div className="bg-gray-50 px-6 py-3 flex justify-between">
-                  <button
-                    onClick={() => handleDelete(leaf.id)}
-                    className="text-red-600 hover:text-red-800"
-                  >
-                    Delete
-                  </button>
-                  <button
-                    onClick={() => router.push(`/leaf/${leaf.id}`)}
-                    className="text-emerald-600 hover:text-emerald-800"
-                  >
-                    View & Edit
-                  </button>
-                </div>
-              </div>
+              <motion.div key={leaf.id} variants={item} className="leaf-card">
+                <Card>
+                  <CardHeader className="pb-3">
+                    <CardTitle className="truncate text-xl">{leaf.title}</CardTitle>
+                  </CardHeader>
+                  <CardContent className="pb-2">
+                    <p className="text-muted-foreground line-clamp-3">
+                      {truncateText(leaf.content, 150)}
+                    </p>
+                    
+                    {leaf.tags.length > 0 && (
+                      <div className="mt-4 flex flex-wrap gap-2">
+                        {leaf.tags.map(tag => (
+                          <div 
+                            key={tag}
+                            className="inline-flex items-center rounded-full border px-2.5 py-0.5 text-xs font-semibold transition-colors focus:outline-none focus:ring-2 focus:ring-ring focus:ring-offset-2 border-transparent bg-primary/10 text-primary hover:bg-primary/20"
+                          >
+                            <Tag className="mr-1 h-3 w-3" />
+                            {tag}
+                          </div>
+                        ))}
+                      </div>
+                    )}
+                    
+                    <div className="mt-4 flex items-center text-xs text-muted-foreground">
+                      <Calendar className="mr-1 h-3 w-3" />
+                      <time dateTime={leaf.updatedAt.toString()}>
+                        {formatDate(leaf.updatedAt)}
+                      </time>
+                    </div>
+                  </CardContent>
+                  <CardFooter className="flex justify-between pt-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-destructive hover:text-destructive/80"
+                      onClick={() => handleDelete(leaf.id)}
+                    >
+                      <Trash2 className="mr-1 h-3.5 w-3.5" />
+                      Delete
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      className="h-8 text-primary hover:text-primary/80"
+                      onClick={() => router.push(`/leaf/${leaf.id}`)}
+                    >
+                      <Edit className="mr-1 h-3.5 w-3.5" />
+                      View & Edit
+                    </Button>
+                  </CardFooter>
+                </Card>
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
         )}
-      </div>
+      </motion.div>
     </ProtectedRoute>
   );
 } 

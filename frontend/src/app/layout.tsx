@@ -1,10 +1,15 @@
 import type { Metadata } from "next";
-import { Inter } from "next/font/google";
+import { Inter as FontSans } from "next/font/google";
 import "./globals.css";
 import { AuthProvider } from "@/context/AuthContext";
+import { ThemeProvider } from "@/components/theme-provider";
+import { cn } from "@/lib/utils";
 import Navbar from "@/components/Navbar";
 
-const inter = Inter({ subsets: ["latin"] });
+const fontSans = FontSans({
+  subsets: ["latin"],
+  variable: "--font-sans",
+});
 
 export const metadata: Metadata = {
   title: "Loreleaf - Personal Knowledge Management",
@@ -17,21 +22,30 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body className={inter.className}>
-        <AuthProvider>
-          <div className="min-h-screen flex flex-col bg-gray-50">
-            <Navbar />
-            <main className="flex-grow container mx-auto py-6 px-4">
-        {children}
-            </main>
-            <footer className="bg-gray-100 border-t py-4">
-              <div className="container mx-auto px-4 text-center text-gray-600">
-                &copy; {new Date().getFullYear()} Loreleaf. All rights reserved.
-              </div>
-            </footer>
-          </div>
-        </AuthProvider>
+    <html lang="en" suppressHydrationWarning>
+      <body
+        className={cn(
+          "min-h-screen bg-background font-sans antialiased",
+          fontSans.variable
+        )}
+      >
+        <ThemeProvider attribute="class" defaultTheme="system" enableSystem>
+          <AuthProvider>
+            <div className="flex min-h-screen flex-col">
+              <Navbar />
+              <main className="flex-1 container mx-auto p-6">
+                {children}
+              </main>
+              <footer className="border-t py-6 md:py-0">
+                <div className="container flex flex-col items-center justify-between gap-4 md:h-16 md:flex-row">
+                  <p className="text-center text-sm text-muted-foreground md:text-left">
+                    &copy; {new Date().getFullYear()} Loreleaf. All rights reserved.
+                  </p>
+                </div>
+              </footer>
+            </div>
+          </AuthProvider>
+        </ThemeProvider>
       </body>
     </html>
   );
