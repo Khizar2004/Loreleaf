@@ -24,31 +24,31 @@ export default function Home() {
               </div>
               <h1 className="text-5xl md:text-6xl lg:text-7xl font-bold text-white leading-tight mb-6 animate-slide-up" style={{ animationDelay: '0.1s' }}>
                 Grow your <span className="text-transparent bg-clip-text bg-gradient-to-r from-emerald-300 to-teal-200">knowledge</span> organically
-              </h1>
+        </h1>
               <p className="text-xl md:text-2xl text-emerald-100 max-w-xl mb-8 animate-slide-up" style={{ animationDelay: '0.2s' }}>
-                A personal knowledge management system inspired by Zettelkasten, Roam Research, and digital gardens.
-                Connect your thoughts, build a knowledge graph, and watch your ideas grow.
-              </p>
-              
+          A personal knowledge management system inspired by Zettelkasten, Roam Research, and digital gardens.
+          Connect your thoughts, build a knowledge graph, and watch your ideas grow.
+        </p>
+        
               <div className="flex flex-col sm:flex-row gap-4 animate-slide-up" style={{ animationDelay: '0.3s' }}>
-                <Link 
-                  href="/register" 
+          <Link 
+            href="/register" 
                   className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium py-3 px-8 rounded-full shadow-lg hover:shadow-emerald-500/30 hover:translate-y-[-2px] transition-all duration-300 text-center group"
-                >
+          >
                   <span className="flex items-center justify-center">
-                    Get Started
+            Get Started
                     <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 ml-2 transform group-hover:translate-x-1 transition-transform" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
                   </span>
-                </Link>
-                <Link 
-                  href="/login" 
+          </Link>
+          <Link 
+            href="/login" 
                   className="bg-white/10 backdrop-blur-sm border border-white/20 text-white hover:bg-white/20 font-medium py-3 px-8 rounded-full transition-all duration-300 text-center"
-                >
-                  Sign In
-                </Link>
-              </div>
+          >
+            Sign In
+          </Link>
+        </div>
               
               <div className="mt-12 flex items-center text-emerald-100/80 text-sm animate-slide-up" style={{ animationDelay: '0.4s' }}>
                 <svg xmlns="http://www.w3.org/2000/svg" className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -125,8 +125,8 @@ export default function Home() {
             <p className="text-xl text-gray-600 dark:text-gray-300">
               Our powerful tools help you capture, connect, and cultivate your ideas
             </p>
-          </div>
-          
+      </div>
+
           <div className="grid grid-cols-1 md:grid-cols-3 gap-8 max-w-6xl mx-auto">
             <div className="relative group">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
@@ -138,8 +138,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Atomic Notes</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Create small, focused notes called leaves. Each leaf contains a single idea, making your knowledge system flexible and interconnected.
-                </p>
+            Create small, focused notes called leaves. Each leaf contains a single idea, making your knowledge system flexible and interconnected.
+          </p>
                 <Link href="/register" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
                   Learn more
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -147,8 +147,8 @@ export default function Home() {
                   </svg>
                 </Link>
               </div>
-            </div>
-            
+        </div>
+
             <div className="relative group mt-8 md:mt-0">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
               <div className="relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-300 hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 h-full z-10">
@@ -159,8 +159,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Knowledge Graph</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Connect your thoughts with bidirectional links. The system automatically creates backlinks, helping you see relationships between ideas.
-                </p>
+            Connect your thoughts with bidirectional links. The system automatically creates backlinks, helping you see relationships between ideas.
+          </p>
                 <Link href="/register" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
                   Learn more
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -168,8 +168,8 @@ export default function Home() {
                   </svg>
                 </Link>
               </div>
-            </div>
-            
+        </div>
+
             <div className="relative group mt-8 md:mt-0">
               <div className="absolute inset-0 bg-gradient-to-r from-emerald-500 to-teal-500 rounded-2xl opacity-0 group-hover:opacity-100 blur-xl transition-opacity duration-500"></div>
               <div className="relative bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-xl border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-300 hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 h-full z-10">
@@ -180,8 +180,8 @@ export default function Home() {
                 </div>
                 <h3 className="text-xl font-semibold mb-3 text-gray-900 dark:text-white">Discover Insights</h3>
                 <p className="text-gray-600 dark:text-gray-300 mb-6">
-                  Search, filter, and analyze your personal knowledge base. Find patterns and connections you never knew existed.
-                </p>
+            Search, filter, and analyze your personal knowledge base. Find patterns and connections you never knew existed.
+          </p>
                 <Link href="/register" className="inline-flex items-center text-emerald-600 dark:text-emerald-400 font-medium hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors">
                   Learn more
                   <svg xmlns="http://www.w3.org/2000/svg" className="h-4 w-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -221,8 +221,8 @@ export default function Home() {
                 Sign In
               </Link>
             </div>
-          </div>
         </div>
+      </div>
       </section>
     </div>
   );

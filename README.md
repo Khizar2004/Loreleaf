@@ -14,6 +14,7 @@ Loreleaf is a personal knowledge management system that helps you organize your 
 - **Backend**: Node.js, Express, TypeScript, PostgreSQL, Prisma ORM
 - **Frontend**: Next.js, React, Tailwind CSS
 - **Authentication**: JWT
+- **Testing**: Jest, React Testing Library, Supertest
 
 ## Getting Started
 
@@ -68,6 +69,58 @@ npm run dev
 ```
 
 8. Visit `http://localhost:3000` in your browser
+
+## Testing
+
+The project includes comprehensive tests for both backend and frontend.
+
+### Backend Tests
+
+To run backend tests:
+
+```
+cd backend
+npm test
+```
+
+Backend tests cover:
+- API controllers
+- Middleware
+- Authentication
+- Error handling
+
+For more details, see [Backend Testing Documentation](backend/tests-readme.md).
+
+### Frontend Tests
+
+To run frontend tests:
+
+```
+cd frontend
+npm test
+```
+
+Frontend tests cover:
+- React components
+- Context providers
+- Authentication flow
+- UI behavior
+
+For more details, see [Frontend Testing Documentation](frontend/tests-readme.md).
+
+## Code Coverage
+
+To generate code coverage reports:
+
+```
+# Backend
+cd backend
+npm run test:coverage
+
+# Frontend
+cd frontend
+npm run test:coverage
+```
 
 ## License
 

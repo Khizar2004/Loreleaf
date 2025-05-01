@@ -32,7 +32,7 @@ export default function RootLayout({
           <div className="min-h-screen flex flex-col">
             <Navbar />
             <main className="flex-grow">
-              {children}
+        {children}
             </main>
             <footer className="bg-gray-900 text-white py-12">
               <div className="container mx-auto px-4">
@@ -65,7 +65,7 @@ export default function RootLayout({
                       </a>
                     </div>
                     <p className="text-gray-400">
-                      &copy; {new Date().getFullYear()} Loreleaf. All rights reserved.
+                &copy; {new Date().getFullYear()} Loreleaf. All rights reserved.
                     </p>
                   </div>
                 </div>
