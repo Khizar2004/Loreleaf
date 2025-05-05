@@ -6,9 +6,9 @@ This document outlines my testing approach for Loreleaf's backend API and servic
 
 I've built a robust testing infrastructure using:
 
-- **Jest**: As the primary testing framework
-- **ts-jest**: For TypeScript integration
-- **supertest**: For testing HTTP endpoints
+- **Jest**: As the primary testing framework (v29.7.0)
+- **ts-jest**: For TypeScript integration (v29.3.2)
+- **supertest**: For testing HTTP endpoints (v7.1.0)
 
 ## Test Structure
 
@@ -18,10 +18,10 @@ Tests are organized in the `src/__tests__` directory, mirroring the main codebas
 src/
 └── __tests__/
     ├── controllers/
-    │   ├── authController.test.ts  # Authentication API endpoints
-    │   └── graphController.test.ts # Knowledge graph API endpoints
+    │   ├── authController.test.ts  # Authentication API tests (login, register, etc.)
+    │   └── graphController.test.ts # Knowledge graph API tests
     └── middleware/
-        └── authMiddleware.test.ts  # Authentication middleware
+        └── authMiddleware.test.ts  # JWT authentication middleware tests
 ```
 
 ## Running Tests
@@ -46,38 +46,38 @@ npm run test:coverage
 
 ## Testing Focus Areas
 
-My tests thoroughly cover these critical components:
+My tests thoroughly cover these critical backend components:
 
-### 1. API Controllers
+### 1. Authentication Controller
 
-The controller tests verify:
-- Proper request handling and validation
-- Correct response formatting and status codes
-- Error handling and appropriate error responses
-- Business logic implementation
+The authController tests verify:
+- User registration with proper validation
+- Login with JWT token generation
+- Proper error handling for invalid credentials
+- User info retrieval for authenticated users
 
-### 2. Authentication
+### 2. Graph Controller
 
-The auth tests ensure:
-- User registration works correctly
-- Login generates valid JWT tokens
-- Protected routes reject unauthorized access
-- Password hashing and verification is secure
+The graphController tests ensure:
+- Knowledge graph data is properly returned
+- Analytics data is correctly aggregated
+- Only authorized users can access graph data
 
-### 3. Middleware
+### 3. Auth Middleware
 
-Middleware tests confirm:
-- JWT validation properly protects routes
-- Error handling for invalid/expired tokens
-- Request processing and modification works as expected
+The middleware tests confirm:
+- Routes are properly protected from unauthorized access
+- Valid JWT tokens grant access to protected routes
+- Invalid or expired tokens are rejected
+- Proper error responses are sent for authentication failures
 
 ## Mocking Strategy
 
 To isolate units for testing, I use:
 
 - Prisma client mocks for database operations
-- JWT mocks for authentication testing
-- Request/response mocks for controller testing
+- JWT mocks for token generation and verification
+- Express request/response mocks
 
 Example from authController tests:
 
@@ -115,10 +115,3 @@ When adding new features to Loreleaf's backend, I follow this process:
 2. Implement the API endpoints or services
 3. Run tests to verify implementation
 4. Refactor for optimization while maintaining test coverage
-
-## CI Integration
-
-These tests run automatically in the CI pipeline before deployment to ensure:
-- No regressions are introduced
-- Code quality remains high
-- Backend services remain reliable and secure 

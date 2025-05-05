@@ -17,9 +17,12 @@ As someone who's always collecting ideas, notes, and insights, I found tradition
 
 ## Tech Stack
 
-- **Backend**: Node.js, Express, TypeScript, PostgreSQL, Prisma ORM
-- **Frontend**: Next.js, React, Tailwind CSS
-- **Authentication**: JWT
+- **Backend**: Node.js (Express 5), TypeScript, PostgreSQL, Prisma ORM
+- **Frontend**: Next.js 15, React 19, Tailwind CSS 4
+- **State Management**: React Context API
+- **Authentication**: JWT with HTTP-only cookies
+- **Form Handling**: React Hook Form with Zod validation
+- **Graph Visualization**: React Force Graph
 - **Testing**: Jest, React Testing Library, Supertest
 
 ## UI Showcase
@@ -66,7 +69,7 @@ As someone who's always collecting ideas, notes, and insights, I found tradition
 
 ### Prerequisites
 
-- Node.js (v14+)
+- Node.js (v20+)
 - PostgreSQL
 
 ### Installation
@@ -92,12 +95,24 @@ npm install
 4. Create a PostgreSQL database named `loreleaf`
 
 5. Configure environment variables:
-   - Create a `.env` file in the `backend` directory based on `.env.example`
+   - Create a `.env` file in the `backend` directory with the following:
+   ```
+   DATABASE_URL="postgresql://username:password@localhost:5432/loreleaf?schema=public"
+   JWT_SECRET="your-secret-key-here"
+   JWT_EXPIRES_IN="7d"
+   PORT=8000
+   NODE_ENV="development"
+   ```
+   - Create a `.env.local` file in the `frontend` directory with:
+   ```
+   NEXT_PUBLIC_API_URL=http://localhost:8000/api
+   ```
 
-6. Run database migrations
+6. Run database setup
 ```
 cd ../backend
-npx prisma migrate dev
+npm run prisma:migrate
+npm run prisma:generate
 ```
 
 7. Start the development servers:
@@ -130,10 +145,9 @@ npm test
 ```
 
 Backend tests cover:
-- API controllers
-- Middleware
-- Authentication
-- Error handling
+- API controllers (authentication, graph operations)
+- Authentication middleware
+- Request validation
 
 For more details, see [Backend Testing Documentation](backend/tests-readme.md).
 
@@ -147,10 +161,9 @@ npm test
 ```
 
 Frontend tests cover:
-- React components
-- Context providers
-- Authentication flow
-- UI behavior
+- React components (Navbar, ProtectedRoute)
+- Authentication context
+- Navigation and protection flows
 
 For more details, see [Frontend Testing Documentation](frontend/tests-readme.md).
 
