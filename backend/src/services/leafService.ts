@@ -504,7 +504,7 @@ export const leafService = {
       }
       
       // Now create links between leaves using the new IDs
-      const links = [];
+      const links: Array<{ sourceId: string, targetId: string }> = [];
       for (const leafData of importData) {
         if (leafData.forwardLinks && Array.isArray(leafData.forwardLinks)) {
           const sourceId = idMap.get(leafData.id);

@@ -8,7 +8,6 @@ import dynamic from 'next/dynamic';
 import Link from 'next/link';
 import ReactMarkdown from 'react-markdown';
 
-// Import ForceGraph dynamically to avoid SSR issues
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
   ssr: false,
   loading: () => (
@@ -29,7 +28,7 @@ interface GraphNode {
   id: string;
   title: string;
   tags: string[];
-  content: string;
+  content?: string;
   forwardLinks?: { id: string; title: string }[];
   backLinks?: { id: string; title: string }[];
 }
@@ -73,8 +72,7 @@ export default function GraphPage() {
             id: node.id,
             title: node.title,
             tags: node.tags,
-            content: node.content,
-          })),
+          })) as GraphNode[],
           links: graphData.edges.map((edge) => ({
             source: edge.sourceLeafId,
             target: edge.targetLeafId,
@@ -96,7 +94,7 @@ export default function GraphPage() {
     fetchData();
   }, []);
 
-  const handleNodeClick = async (node: GraphNode) => {
+  const handleNodeClick = async (node: any) => {
     try {
       // Fetch complete leaf data when a node is clicked
       const leafDetails = await leafService.getLeaf(node.id);
@@ -104,11 +102,11 @@ export default function GraphPage() {
     } catch (err) {
       console.error('Error fetching leaf details:', err);
       // If fetch fails, use the basic node data
-      setSelectedNode(node);
+      setSelectedNode(node as unknown as GraphNode);
     }
   };
 
-  const handleNodeDoubleClick = (node: GraphNode) => {
+  const handleNodeDoubleClick = (node: any) => {
     router.push(`/leaf/${node.id}`);
   };
 
@@ -121,6 +119,9 @@ export default function GraphPage() {
   const handleBgClick = () => {
     setSelectedNode(null);
   };
+
+  // Use any for the node type since ForceGraph2D has its own node type
+  const ForceGraphWrapper = ForceGraph2D as any;
 
   return (
     <ProtectedRoute>
@@ -223,27 +224,27 @@ export default function GraphPage() {
                   <div className="h-[70vh] relative bg-gray-50 dark:bg-gray-900/50 z-10">
             {graphData && (
                       <>
-              <ForceGraph2D
+              <ForceGraphWrapper
                 ref={graphRef}
                 graphData={graphData}
                 nodeLabel={(node: any) => node.title}
-                          nodeColor={(node: any) => selectedNode && node.id === selectedNode.id ? '#7c3aed' : '#10b981'}
-                          nodeRelSize={6}
-                          linkColor={() => 'rgba(100, 116, 139, 0.2)'}
-                          linkWidth={(link: any) => 1.5}
+                nodeColor={(node: any) => selectedNode && node.id === selectedNode.id ? '#7c3aed' : '#10b981'}
+                nodeRelSize={6}
+                linkColor={() => 'rgba(100, 116, 139, 0.2)'}
+                linkWidth={(link: any) => 1.5}
                 onNodeClick={handleNodeClick}
-                          onNodeDblClick={handleNodeDoubleClick}
+                onNodeDblClick={handleNodeDoubleClick}
                 linkDirectionalArrowLength={3.5}
                 linkDirectionalArrowRelPos={1}
                 linkCurvature={0.25}
                 cooldownTicks={100}
                 onEngineStop={() => handleZoomToFit()}
-                          backgroundColor="rgba(0,0,0,0)"
-                          onBackgroundClick={handleBgClick}
-                          linkDirectionalParticles={2}
-                          linkDirectionalParticleSpeed={0.005}
-                          showNavInfo={false}
-                        />
+                backgroundColor="rgba(0,0,0,0)"
+                onBackgroundClick={handleBgClick}
+                linkDirectionalParticles={2}
+                linkDirectionalParticleSpeed={0.005}
+                showNavInfo={false}
+              />
                         <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-3 rounded-lg shadow text-xs text-gray-500 dark:text-gray-400 z-20">
                           <div className="mb-1">• Click node to select</div>
                           <div className="mb-1">• Double-click to view/edit</div>

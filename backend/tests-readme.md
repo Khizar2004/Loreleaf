@@ -1,99 +1,124 @@
-# Backend Testing Documentation
+# Loreleaf Backend Testing Documentation
 
-This document outlines the testing approach for the Loreleaf backend.
+This document outlines my testing approach for Loreleaf's backend API and services.
 
-## Testing Framework
+## Testing Technologies
 
-We use Jest as our testing framework, along with the following additional tools:
+I've built a robust testing infrastructure using:
 
-- **ts-jest**: For TypeScript support
-- **supertest**: For API endpoint testing
+- **Jest**: As the primary testing framework
+- **ts-jest**: For TypeScript integration
+- **supertest**: For testing HTTP endpoints
 
 ## Test Structure
 
-Tests are organized in the `src/__tests__` directory and follow a structure that mirrors the main application:
+Tests are organized in the `src/__tests__` directory, mirroring the main codebase structure:
 
 ```
 src/
 └── __tests__/
     ├── controllers/
-    │   ├── authController.test.ts
-    │   └── graphController.test.ts
-    ├── middleware/
-    │   └── authMiddleware.test.ts
-    └── utils/
-        └── ...
+    │   ├── authController.test.ts  # Authentication API endpoints
+    │   └── graphController.test.ts # Knowledge graph API endpoints
+    └── middleware/
+        └── authMiddleware.test.ts  # Authentication middleware
 ```
 
 ## Running Tests
 
-To run all tests:
+To run the complete test suite:
 
 ```bash
 npm test
 ```
 
-To run tests with watch mode (development):
+For development with auto-reloading:
 
 ```bash
 npm run test:watch
 ```
 
-To generate a coverage report:
+To generate coverage reports:
 
 ```bash
 npm run test:coverage
 ```
 
-## Test Coverage
+## Testing Focus Areas
 
-The test suite aims to cover:
+My tests thoroughly cover these critical components:
 
-1. **Controllers** - Testing API endpoints for proper request handling, response formatting, and error handling
-2. **Middleware** - Ensuring middleware functions like authentication are working correctly
-3. **Services** - Testing business logic functionality
-4. **Utils** - Testing utility functions
+### 1. API Controllers
+
+The controller tests verify:
+- Proper request handling and validation
+- Correct response formatting and status codes
+- Error handling and appropriate error responses
+- Business logic implementation
+
+### 2. Authentication
+
+The auth tests ensure:
+- User registration works correctly
+- Login generates valid JWT tokens
+- Protected routes reject unauthorized access
+- Password hashing and verification is secure
+
+### 3. Middleware
+
+Middleware tests confirm:
+- JWT validation properly protects routes
+- Error handling for invalid/expired tokens
+- Request processing and modification works as expected
 
 ## Mocking Strategy
 
-We use Jest's mocking capabilities to isolate the components being tested:
+To isolate units for testing, I use:
 
-- Database interactions are mocked via the Prisma client
-- External services are mocked with Jest mock functions
-- Authentication is mocked using JWT token verification mocks
+- Prisma client mocks for database operations
+- JWT mocks for authentication testing
+- Request/response mocks for controller testing
 
-## Example Test
-
-Here's an example of how we test the authentication controller:
+Example from authController tests:
 
 ```typescript
-describe('Auth Controller', () => {
-  // Test setup with mocks
-  
-  describe('loginUser', () => {
-    it('should login a user successfully', async () => {
-      // Arrange - setup test data
-      
-      // Act - call the controller function
-      
-      // Assert - verify the results
+describe('loginUser', () => {
+  it('should return a token when valid credentials are provided', async () => {
+    // Mock Prisma to return a matching user
+    prismaMock.user.findUnique.mockResolvedValue({
+      id: 1,
+      email: 'test@example.com',
+      password: hashedPassword,
+      name: 'Test User',
+      createdAt: new Date(),
+      updatedAt: new Date()
     });
     
-    it('should handle invalid credentials', async () => {
-      // Test error cases
-    });
+    // Mock bcrypt to return true for password comparison
+    bcryptMock.compare.mockResolvedValue(true);
+    
+    const res = await request(app)
+      .post('/api/auth/login')
+      .send({ email: 'test@example.com', password: 'password123' });
+    
+    expect(res.status).toBe(200);
+    expect(res.body).toHaveProperty('token');
   });
 });
 ```
 
-## Adding New Tests
+## Development Workflow
 
-When adding new features, please follow this test-driven approach:
+When adding new features to Loreleaf's backend, I follow this process:
 
-1. Write tests that define the expected behavior
-2. Implement the feature to satisfy the tests
-3. Refactor while ensuring tests still pass
+1. Write test cases first that define expected behavior
+2. Implement the API endpoints or services
+3. Run tests to verify implementation
+4. Refactor for optimization while maintaining test coverage
 
 ## CI Integration
 
-These tests are integrated into the CI pipeline and must pass before merging. 
+These tests run automatically in the CI pipeline before deployment to ensure:
+- No regressions are introduced
+- Code quality remains high
+- Backend services remain reliable and secure 

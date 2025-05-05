@@ -19,14 +19,14 @@ This is the backend for Loreleaf, a personal knowledge management system inspire
 - Advanced filtering and search
 - Analytics endpoints
 
-## Installation
+## Quick Start
 
 1. Install dependencies:
    ```
    npm install
    ```
 
-2. Set up your environment variables by creating a `.env` file based on the example:
+2. Set up environment variables:
    ```
    DATABASE_URL="postgresql://username:password@localhost:5432/loreleaf?schema=public"
    JWT_SECRET="your-secret-key-here"
@@ -35,53 +35,16 @@ This is the backend for Loreleaf, a personal knowledge management system inspire
    NODE_ENV="development"
    ```
 
-3. Run Prisma migrations to set up the database:
+3. Run database setup:
    ```
    npm run prisma:migrate
-   ```
-
-4. Generate Prisma client:
-   ```
    npm run prisma:generate
    ```
 
-## Development
-
-Start the development server:
-```
-npm run dev
-```
-
-## Build and Run
-
-Build the project:
-```
-npm run build
-```
-
-Start the production server:
-```
-npm start
-```
-
-## API Endpoints
-
-### Auth Routes
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Login and get token
-- `POST /api/auth/logout` - Logout (clear cookie)
-- `GET /api/auth/me` - Get current user info
-
-### Leaf Routes
-- `GET /api/leaves` - Get all leaves (with optional filtering)
-- `POST /api/leaves` - Create a new leaf
-- `GET /api/leaves/:id` - Get a specific leaf
-- `PUT /api/leaves/:id` - Update a leaf
-- `DELETE /api/leaves/:id` - Delete a leaf
-
-### Graph Routes
-- `GET /api/graph` - Get knowledge graph data
-- `GET /api/graph/analytics` - Get analytics data
+4. Start development server:
+   ```
+   npm run dev
+   ```
 
 ## Project Structure
 
@@ -93,9 +56,27 @@ backend/
 │   ├── routes/            # API routes
 │   ├── services/          # Business logic
 │   ├── utils/             # Utility functions
-│   ├── config/            # Configuration
+│   ├── __tests__/         # Test files
 │   └── server.ts          # Express app
 ├── prisma/
 │   ├── schema.prisma      # Database schema
 └── package.json
-``` 
+```
+
+## Key API Endpoints
+
+### Auth
+- `POST /api/auth/register` - Register new user
+- `POST /api/auth/login` - Login and get token
+- `GET /api/auth/me` - Get current user info
+
+### Leaves
+- `GET /api/leaves` - List leaves (with filtering)
+- `POST /api/leaves` - Create leaf
+- `GET /api/leaves/:id` - Get specific leaf
+- `PUT /api/leaves/:id` - Update leaf
+- `DELETE /api/leaves/:id` - Delete leaf
+
+### Graph
+- `GET /api/graph` - Get knowledge graph data
+- `GET /api/graph/analytics` - Get analytics data 
