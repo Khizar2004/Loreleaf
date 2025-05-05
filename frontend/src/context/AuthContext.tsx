@@ -55,7 +55,6 @@ export const AuthProvider = ({ children }: AuthProviderProps) => {
         }
       } catch (err) {
         // Not authenticated yet or token expired
-        console.log('Not authenticated');
       } finally {
         setLoading(false);
       }

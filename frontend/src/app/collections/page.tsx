@@ -68,8 +68,6 @@ export default function CollectionsPage() {
         return;
       }
       
-      console.log('Migrating', localCollections.length, 'collections from localStorage to backend');
-
       // Process each collection and add to backend
       for (const collection of localCollections) {
         try {
@@ -94,8 +92,6 @@ export default function CollectionsPage() {
       
       // Reload collections from backend
       await fetchAllCollections();
-      
-      console.log('Migration completed');
     } catch (err) {
       console.error('Error during migration:', err);
     }
