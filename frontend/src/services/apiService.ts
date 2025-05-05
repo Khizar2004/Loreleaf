@@ -63,6 +63,34 @@ export interface Analytics {
   growthByMonth: Record<string, number>;
 }
 
+export interface Collection {
+  id: string;
+  name: string;
+  tags: string[];
+  searchTerm: string | null;
+  createdAfter: string | null;
+  createdBefore: string | null;
+  createdAt: string;
+  updatedAt: string;
+  userId: string;
+}
+
+export interface CreateCollectionData {
+  name: string;
+  tags?: string[];
+  searchTerm?: string;
+  createdAfter?: string;
+  createdBefore?: string;
+}
+
+export interface UpdateCollectionData {
+  name?: string;
+  tags?: string[];
+  searchTerm?: string | null;
+  createdAfter?: string | null;
+  createdBefore?: string | null;
+}
+
 const leafService = {
   // Get all leaves with optional filtering
   async getLeaves(filters?: FilterParams): Promise<Leaf[]> {
@@ -119,6 +147,35 @@ const leafService = {
   async getAnalytics(): Promise<Analytics> {
     const response = await api.get('/graph/analytics');
     return response.data.analytics;
+  },
+
+  // Get all collections
+  async getCollections(): Promise<Collection[]> {
+    const response = await api.get('/collections');
+    return response.data.collections;
+  },
+
+  // Get a collection by ID
+  async getCollection(id: string): Promise<Collection> {
+    const response = await api.get(`/collections/${id}`);
+    return response.data.collection;
+  },
+
+  // Create a new collection
+  async createCollection(data: CreateCollectionData): Promise<Collection> {
+    const response = await api.post('/collections', data);
+    return response.data.collection;
+  },
+
+  // Update a collection
+  async updateCollection(id: string, data: UpdateCollectionData): Promise<Collection> {
+    const response = await api.put(`/collections/${id}`, data);
+    return response.data.collection;
+  },
+
+  // Delete a collection
+  async deleteCollection(id: string): Promise<void> {
+    await api.delete(`/collections/${id}`);
   },
 };
 

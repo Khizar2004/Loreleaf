@@ -5,6 +5,7 @@ import Link from 'next/link';
 import { useRouter } from 'next/navigation';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import leafService, { Leaf, FilterParams } from '@/services/apiService';
+import ReactMarkdown from 'react-markdown';
 
 export default function DashboardPage() {
   const [leaves, setLeaves] = useState<Leaf[]>([]);
@@ -15,6 +16,8 @@ export default function DashboardPage() {
   const [selectedTags, setSelectedTags] = useState<string[]>([]);
   const [allTags, setAllTags] = useState<string[]>([]);
   const [animateItems, setAnimateItems] = useState(false);
+  const [selectedLeaf, setSelectedLeaf] = useState<Leaf | null>(null);
+  const [popupPosition, setPopupPosition] = useState({ x: 0, y: 0 });
   
   const router = useRouter();
 
@@ -84,6 +87,30 @@ export default function DashboardPage() {
     setTimeout(() => setAnimateItems(true), 100);
   };
 
+  const handleLeafClick = (leaf: Leaf, event: React.MouseEvent) => {
+    // No need to calculate position anymore
+    setSelectedLeaf(leaf);
+  };
+
+  const handleClosePopup = () => {
+    setSelectedLeaf(null);
+  };
+
+  useEffect(() => {
+    // Close popup when clicking outside
+    const handleClickOutside = (event: MouseEvent) => {
+      if (selectedLeaf && !(event.target as Element).closest('.leaf-popup') && 
+          !(event.target as Element).closest('.leaf-card')) {
+        setSelectedLeaf(null);
+      }
+    };
+
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => {
+      document.removeEventListener('mousedown', handleClickOutside);
+    };
+  }, [selectedLeaf]);
+
   return (
     <ProtectedRoute>
       <div className="bg-gradient-to-b from-gray-50 to-white dark:from-gray-900 dark:to-gray-800 min-h-screen pt-20 pb-12">
@@ -92,25 +119,25 @@ export default function DashboardPage() {
           <div className="bg-gradient-to-r from-emerald-700 to-teal-600 rounded-2xl p-8 shadow-xl mb-8 transform transition-all relative overflow-hidden">
             <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6bTAgMTJ2NmMwIDYgNiA2IDYgMHYtNmgtNnptLTEyIDB2NmMwIDYgNiA2IDYgMHYtNmgtNnptMCAxMnY2YzAgNiA2IDYgNiAwdi02aC02em0wIDEydjZjMCA2IDYgNiA2IDB2LTZoLTZ6bS0xMi0xMnY2YzAgNiA2IDYgNiAwdi02aC02em0wIDEydjZjMCA2IDYgNiA2IDB2LTZoLTZ6bTEyLTI0djZjMCA2IDYgNiA2IDB2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
             <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-              <div>
+      <div>
                 <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Your Knowledge Garden</h1>
                 <p className="text-emerald-100">
                   {leaves.length} {leaves.length === 1 ? 'leaf' : 'leaves'} in your collection
                 </p>
               </div>
-              <Link 
-                href="/leaf/new" 
+          <Link 
+            href="/leaf/new" 
                 className="bg-white text-emerald-700 hover:bg-emerald-50 py-3 px-6 rounded-full shadow-lg font-medium transition-all hover:scale-105 hover:shadow-emerald-900/20 flex items-center group"
-              >
+          >
                 <span className="mr-2">+</span>
                 <span>New Leaf</span>
                 <svg className="w-0 h-5 overflow-hidden transition-all duration-300 group-hover:w-5 ml-0 group-hover:ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
-              </Link>
+          </Link>
             </div>
-          </div>
-          
+        </div>
+
           {/* Search and Filter Section */}
           <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg p-6 mb-8">
             <form onSubmit={handleSearch} className="flex flex-col md:flex-row gap-4 mb-6">
@@ -120,20 +147,20 @@ export default function DashboardPage() {
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                   </svg>
                 </div>
-                <input
-                  type="text"
-                  value={searchTerm}
-                  onChange={(e) => setSearchTerm(e.target.value)}
+            <input
+              type="text"
+              value={searchTerm}
+              onChange={(e) => setSearchTerm(e.target.value)}
                   placeholder="Search your leaves..."
                   className="w-full pl-10 pr-4 py-3 border border-gray-200 dark:border-gray-700 rounded-xl focus:outline-none focus:ring-2 focus:ring-emerald-500 focus:border-transparent dark:bg-gray-700 dark:text-white"
-                />
+            />
               </div>
-              <button
-                type="submit"
+            <button
+              type="submit"
                 className="bg-emerald-600 hover:bg-emerald-700 text-white py-3 px-6 rounded-xl shadow-md hover:shadow-lg transition-all duration-300"
-              >
-                Search
-              </button>
+            >
+              Search
+            </button>
               {(selectedTags.length > 0 || searchTerm) && (
                 <button
                   type="button"
@@ -143,7 +170,7 @@ export default function DashboardPage() {
                   Clear Filters
                 </button>
               )}
-            </form>
+          </form>
             
             {allTags.length > 0 && (
               <div>
@@ -165,22 +192,22 @@ export default function DashboardPage() {
                 </div>
               </div>
             )}
-          </div>
+        </div>
 
           {/* Error Message */}
-          {error && (
+        {error && (
             <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 animate-fade-in">
               <div className="flex items-center">
                 <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                 </svg>
-                {error}
+            {error}
               </div>
-            </div>
-          )}
+          </div>
+        )}
 
           {/* Content Area */}
-          {loading ? (
+        {loading ? (
             <div className="flex flex-col items-center justify-center py-20">
               <div className="relative w-24 h-24">
                 <div className="absolute inset-0 flex items-center justify-center">
@@ -191,8 +218,8 @@ export default function DashboardPage() {
                 </div>
               </div>
               <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your knowledge garden...</p>
-            </div>
-          ) : leaves.length === 0 ? (
+          </div>
+        ) : leaves.length === 0 ? (
             <div className="bg-white dark:bg-gray-800 rounded-2xl p-10 shadow-lg text-center max-w-2xl mx-auto animate-fade-in">
               <div className="inline-block p-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-6">
                 <svg className="w-16 h-16 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -203,33 +230,34 @@ export default function DashboardPage() {
               <p className="text-gray-600 dark:text-gray-400 mb-8 max-w-md mx-auto">
                 Time to plant your first thought! Create your first leaf and start growing your knowledge garden.
               </p>
-              <Link 
-                href="/leaf/new" 
+            <Link 
+              href="/leaf/new" 
                 className="bg-gradient-to-r from-emerald-500 to-teal-500 text-white font-medium py-3 px-8 rounded-xl shadow-lg hover:shadow-emerald-500/30 hover:translate-y-[-2px] transition-all duration-300 inline-flex items-center"
-              >
+            >
                 <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
                 </svg>
-                Create your first leaf
-              </Link>
-            </div>
-          ) : (
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+              Create your first leaf
+            </Link>
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
               {leaves.map((leaf, index) => (
-                <div 
-                  key={leaf.id} 
-                  className={`group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-500 hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 ${
-                    animateItems 
-                      ? 'opacity-100 translate-y-0' 
-                      : 'opacity-0 translate-y-8'
-                  }`}
-                  style={{ transitionDelay: `${index * 50}ms` }}
-                >
-                  <div className="p-6 flex-grow">
+              <div 
+                key={leaf.id}
+                className={`leaf-card group bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden flex flex-col border border-gray-100 dark:border-gray-700 hover:border-emerald-200 dark:hover:border-emerald-800/50 transition-all duration-500 hover:shadow-emerald-100 dark:hover:shadow-emerald-900/30 ${
+                  animateItems 
+                    ? 'opacity-100 translate-y-0' 
+                    : 'opacity-0 translate-y-8'
+                }`}
+                style={{ transitionDelay: `${index * 50}ms` }}
+                onClick={(e) => handleLeafClick(leaf, e)}
+              >
+                <div className="p-6 flex-grow cursor-pointer">
                     <div className="flex justify-between items-start mb-4">
                       <h3 className="text-xl font-bold text-gray-800 dark:text-white group-hover:text-emerald-600 dark:group-hover:text-emerald-400 transition-colors duration-300 truncate flex-grow">
-                        {leaf.title}
-                      </h3>
+                    {leaf.title}
+                  </h3>
                       <span className="text-xs bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 px-2 py-1 rounded-full">
                         {new Date(leaf.updatedAt).toLocaleDateString('en-US', {
                           month: 'short',
@@ -238,19 +266,19 @@ export default function DashboardPage() {
                       </span>
                     </div>
                     <p className="text-gray-600 dark:text-gray-300 mb-4 line-clamp-3">
-                      {leaf.content}
-                    </p>
+                    {leaf.content}
+                  </p>
                     {leaf.tags.length > 0 && (
-                      <div className="flex flex-wrap gap-2 mb-4">
-                        {leaf.tags.map((tag) => (
-                          <span 
-                            key={tag} 
+                  <div className="flex flex-wrap gap-2 mb-4">
+                    {leaf.tags.map((tag) => (
+                      <span 
+                        key={tag} 
                             className="bg-emerald-50 dark:bg-emerald-900/20 text-emerald-700 dark:text-emerald-300 text-xs px-2 py-1 rounded-full"
-                          >
-                            {tag}
-                          </span>
-                        ))}
-                      </div>
+                      >
+                        {tag}
+                      </span>
+                    ))}
+                  </div>
                     )}
                     
                     {/* Link indicators for the knowledge graph */}
@@ -264,32 +292,143 @@ export default function DashboardPage() {
                         </span>
                       </div>
                     )}
-                  </div>
+                </div>
                   <div className="border-t border-gray-100 dark:border-gray-700 px-6 py-4 flex justify-between items-center bg-gray-50 dark:bg-gray-800/80">
-                    <button
-                      onClick={() => handleDelete(leaf.id)}
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      handleDelete(leaf.id);
+                    }}
                       className="text-gray-500 dark:text-gray-400 hover:text-red-600 dark:hover:text-red-400 transition-colors duration-300 flex items-center"
-                    >
+                  >
                       <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16" />
                       </svg>
-                      Delete
-                    </button>
-                    <button
-                      onClick={() => router.push(`/leaf/${leaf.id}`)}
+                    Delete
+                  </button>
+                  <button
+                    onClick={(e) => {
+                      e.stopPropagation();
+                      router.push(`/leaf/${leaf.id}`);
+                    }}
                       className="text-emerald-600 dark:text-emerald-400 hover:text-emerald-700 dark:hover:text-emerald-300 transition-colors duration-300 flex items-center"
-                    >
-                      <span>View & Edit</span>
+                  >
+                      <span>Edit</span>
                       <svg className="w-4 h-4 ml-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
                       </svg>
+                  </button>
+                </div>
+              </div>
+            ))}
+          </div>
+        )}
+        
+        {/* Leaf Detail Popup */}
+        {selectedLeaf && (
+          <>
+            {/* Backdrop overlay */}
+            <div 
+              className="fixed inset-0 bg-black/30 dark:bg-black/50 backdrop-blur-sm z-40"
+              onClick={handleClosePopup}
+            />
+            
+            <div 
+              className="leaf-popup fixed z-50 animate-fade-in"
+              style={{
+                top: '50%',
+                left: '50%',
+                transform: 'translate(-50%, -50%)',
+                maxWidth: "90vw",
+                width: "500px",
+                maxHeight: "80vh"
+              }}
+            >
+              <div className="bg-gradient-to-br from-white to-emerald-50 dark:from-gray-800 dark:to-emerald-950/30 rounded-2xl shadow-2xl overflow-hidden border-2 border-emerald-200 dark:border-emerald-800">
+                <div className="border-b border-emerald-100 dark:border-emerald-800/50 px-6 py-4 bg-emerald-50/80 dark:bg-emerald-900/30 flex justify-between items-center">
+                  <div className="flex items-center">
+                    <div className="flex space-x-2 mr-3">
+                      <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                      <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                    </div>
+                    <span className="text-gray-700 dark:text-emerald-100 text-sm font-medium">Leaf Details</span>
+                  </div>
+                  <button 
+                    onClick={handleClosePopup}
+                    className="text-gray-500 hover:text-gray-700 dark:text-gray-300 dark:hover:text-white transition-colors"
+                  >
+                    <svg className="w-5 h-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                </div>
+                
+                <div className="p-6 overflow-y-auto bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm" style={{ maxHeight: "calc(80vh - 60px)" }}>
+                  <h2 className="text-2xl font-bold mb-4 text-gray-800 dark:text-white">
+                    {selectedLeaf.title}
+                  </h2>
+                  
+                  {selectedLeaf.tags.length > 0 && (
+                    <div className="mb-4 mt-2">
+                      <div className="flex flex-wrap gap-2">
+                        {selectedLeaf.tags.map(tag => (
+                          <span 
+                            key={tag} 
+                            className="bg-emerald-100 dark:bg-emerald-900/50 text-emerald-800 dark:text-emerald-300 text-xs px-2 py-1 rounded-full"
+                          >
+                            {tag}
+                          </span>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="prose dark:prose-invert max-w-none mb-6">
+                    <ReactMarkdown>{selectedLeaf.content}</ReactMarkdown>
+                  </div>
+                  
+                  {(selectedLeaf.forwardLinks?.length || selectedLeaf.backLinks?.length) && (
+                    <div className="mt-6 pt-4 border-t border-emerald-100 dark:border-emerald-800/50">
+                      <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-3">Connected Leaves</h3>
+                      <div className="space-y-2">
+                        {selectedLeaf.forwardLinks?.map(link => (
+                          <div key={link.id} className="flex items-center">
+                            <svg className="w-4 h-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                            </svg>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{link.title}</span>
+                          </div>
+                        ))}
+                        {selectedLeaf.backLinks?.map(link => (
+                          <div key={link.id} className="flex items-center">
+                            <svg className="w-4 h-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                            </svg>
+                            <span className="text-sm text-gray-600 dark:text-gray-400">{link.title}</span>
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                  
+                  <div className="mt-6 flex justify-end">
+                    <button
+                      onClick={() => router.push(`/leaf/${selectedLeaf.id}`)}
+                      className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center"
+                    >
+                      <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
+                      </svg>
+                      Edit
                     </button>
                   </div>
                 </div>
-              ))}
+              </div>
             </div>
-          )}
+          </>
+        )}
         </div>
       </div>
     </ProtectedRoute>

@@ -14,13 +14,14 @@ datasource db {
 }
 
 model User {
-  id        String   @id @default(uuid())
-  email     String   @unique
-  password  String
-  name      String?
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-  leaves    Leaf[]
+  id         String       @id @default(uuid())
+  email      String       @unique
+  password   String
+  name       String?
+  createdAt  DateTime     @default(now())
+  updatedAt  DateTime     @updatedAt
+  leaves     Leaf[]
+  collections Collection[]
 }
 
 model Leaf {
@@ -48,4 +49,17 @@ model LeafLink {
   targetLeaf   Leaf     @relation("TargetLeaf", fields: [targetLeafId], references: [id], onDelete: Cascade)
 
   @@unique([sourceLeafId, targetLeafId])
+}
+
+model Collection {
+  id           String   @id @default(uuid())
+  name         String
+  tags         String[]
+  searchTerm   String?
+  createdAfter DateTime?
+  createdBefore DateTime?
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+  userId       String
+  user         User     @relation(fields: [userId], references: [id], onDelete: Cascade)
 }

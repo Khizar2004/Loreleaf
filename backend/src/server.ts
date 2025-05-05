@@ -8,6 +8,7 @@ import { errorHandler } from './middleware/errorHandler';
 import authRoutes from './routes/authRoutes';
 import leafRoutes from './routes/leafRoutes';
 import graphRoutes from './routes/graphRoutes';
+import collectionRoutes from './routes/collectionRoutes';
 
 // Load environment variables
 dotenv.config();
@@ -32,6 +33,7 @@ app.use(
 app.use('/api/auth', authRoutes);
 app.use('/api/leaves', leafRoutes);
 app.use('/api/graph', graphRoutes);
+app.use('/api/collections', collectionRoutes);
 
 // Error handling middleware
 app.use(errorHandler);

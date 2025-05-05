@@ -6,6 +6,7 @@ import ProtectedRoute from '@/components/ProtectedRoute';
 import leafService, { GraphData, Analytics } from '@/services/apiService';
 import dynamic from 'next/dynamic';
 import Link from 'next/link';
+import ReactMarkdown from 'react-markdown';
 
 // Import ForceGraph dynamically to avoid SSR issues
 const ForceGraph2D = dynamic(() => import('react-force-graph-2d'), {
@@ -28,6 +29,9 @@ interface GraphNode {
   id: string;
   title: string;
   tags: string[];
+  content: string;
+  forwardLinks?: { id: string; title: string }[];
+  backLinks?: { id: string; title: string }[];
 }
 
 interface GraphLink {
@@ -69,6 +73,7 @@ export default function GraphPage() {
             id: node.id,
             title: node.title,
             tags: node.tags,
+            content: node.content,
           })),
           links: graphData.edges.map((edge) => ({
             source: edge.sourceLeafId,
@@ -91,8 +96,16 @@ export default function GraphPage() {
     fetchData();
   }, []);
 
-  const handleNodeClick = (node: GraphNode) => {
-    setSelectedNode(node);
+  const handleNodeClick = async (node: GraphNode) => {
+    try {
+      // Fetch complete leaf data when a node is clicked
+      const leafDetails = await leafService.getLeaf(node.id);
+      setSelectedNode(leafDetails);
+    } catch (err) {
+      console.error('Error fetching leaf details:', err);
+      // If fetch fails, use the basic node data
+      setSelectedNode(node);
+    }
   };
 
   const handleNodeDoubleClick = (node: GraphNode) => {
@@ -118,22 +131,22 @@ export default function GraphPage() {
             <div className="bg-gradient-to-r from-emerald-700 to-teal-600 rounded-2xl p-8 shadow-xl mb-8 relative overflow-hidden">
               <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PHBhdGggZD0iTTM2IDM0djZoNnYtNmgtNnptMC0zMHY2aDZ2LTZoLTZ6bTAgMTJ2NmMwIDYgNiA2IDYgMHYtNmgtNnptLTEyIDB2NmMwIDYgNiA2IDYgMHYtNmgtNnptMCAxMnY2YzAgNiA2IDYgNiAwdi02aC02em0wIDEydjZjMCA2IDYgNiA2IDB2LTZoLTZ6bS0xMi0xMnY2YzAgNiA2IDYgNiAwdi02aC02em0wIDEydjZjMCA2IDYgNiA2IDB2LTZoLTZ6bTEyLTI0djZjMCA2IDYgNiA2IDB2LTZoLTZ6Ii8+PC9nPjwvZz48L3N2Zz4=')] opacity-20"></div>
               <div className="relative z-10 flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-                <div>
+      <div>
                   <h1 className="text-3xl md:text-4xl font-bold text-white mb-2">Knowledge Graph</h1>
                   <p className="text-emerald-100">
                     {graphData ? `Visualize your collection of ${graphData.nodes.length} leaves and their connections` : 'Loading your knowledge connections...'}
                   </p>
                 </div>
                 <div className="flex gap-3">
-                  <button
-                    onClick={handleZoomToFit}
+          <button
+            onClick={handleZoomToFit}
                     className="bg-white/90 text-emerald-700 hover:bg-white py-3 px-6 rounded-full shadow-lg font-medium transition-all hover:shadow-emerald-900/20 flex items-center"
-                  >
+          >
                     <svg className="w-5 h-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
                     </svg>
-                    Zoom to Fit
-                  </button>
+            Zoom to Fit
+          </button>
                   <Link
                     href="/dashboard"
                     className="bg-white/20 text-white hover:bg-white/30 py-3 px-6 rounded-full shadow-lg font-medium transition-all hover:shadow-emerald-900/20 flex items-center"
@@ -145,20 +158,20 @@ export default function GraphPage() {
                   </Link>
                 </div>
               </div>
-            </div>
+        </div>
 
-            {error && (
+        {error && (
               <div className="bg-red-100 border-l-4 border-red-500 text-red-700 p-4 rounded-lg mb-6 animate-fade-in">
                 <div className="flex items-center">
                   <svg className="h-5 w-5 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
                   </svg>
-                  {error}
+            {error}
                 </div>
-              </div>
-            )}
+          </div>
+        )}
 
-            {loading ? (
+        {loading ? (
               <div className="flex flex-col items-center justify-center py-20">
                 <div className="relative w-24 h-24">
                   <div className="absolute inset-0 flex items-center justify-center">
@@ -169,8 +182,8 @@ export default function GraphPage() {
                   </div>
                 </div>
                 <p className="mt-4 text-gray-600 dark:text-gray-400">Loading your knowledge graph...</p>
-              </div>
-            ) : graphData && graphData.nodes.length === 0 ? (
+          </div>
+        ) : graphData && graphData.nodes.length === 0 ? (
               <div className="bg-white dark:bg-gray-800 rounded-2xl p-10 shadow-lg text-center max-w-2xl mx-auto animate-fade-in">
                 <div className="inline-block p-6 bg-emerald-100 dark:bg-emerald-900/30 rounded-full mb-6">
                   <svg className="w-16 h-16 text-emerald-600 dark:text-emerald-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -190,8 +203,8 @@ export default function GraphPage() {
                   </svg>
                   Create your first leaf
                 </Link>
-              </div>
-            ) : (
+          </div>
+        ) : (
               <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
                 {/* Main Graph Section */}
                 <div className="md:col-span-3 bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
@@ -205,35 +218,31 @@ export default function GraphPage() {
                         </div>
                         <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">Graph View</span>
                       </div>
-                      {selectedNode && (
-                        <div className="text-sm text-gray-500 dark:text-gray-400">
-                          <span className="font-medium text-emerald-600 dark:text-emerald-400">{selectedNode.title}</span> selected
-                        </div>
-                      )}
                     </div>
                   </div>
                   <div className="h-[70vh] relative bg-gray-50 dark:bg-gray-900/50 z-10">
-                    {graphData && (
+            {graphData && (
                       <>
-                        <ForceGraph2D
-                          ref={graphRef}
-                          graphData={graphData}
-                          nodeLabel={(node: any) => node.title}
+              <ForceGraph2D
+                ref={graphRef}
+                graphData={graphData}
+                nodeLabel={(node: any) => node.title}
                           nodeColor={(node: any) => selectedNode && node.id === selectedNode.id ? '#7c3aed' : '#10b981'}
                           nodeRelSize={6}
                           linkColor={() => 'rgba(100, 116, 139, 0.2)'}
                           linkWidth={(link: any) => 1.5}
-                          onNodeClick={handleNodeClick}
+                onNodeClick={handleNodeClick}
                           onNodeDblClick={handleNodeDoubleClick}
-                          linkDirectionalArrowLength={3.5}
-                          linkDirectionalArrowRelPos={1}
-                          linkCurvature={0.25}
-                          cooldownTicks={100}
-                          onEngineStop={() => handleZoomToFit()}
+                linkDirectionalArrowLength={3.5}
+                linkDirectionalArrowRelPos={1}
+                linkCurvature={0.25}
+                cooldownTicks={100}
+                onEngineStop={() => handleZoomToFit()}
                           backgroundColor="rgba(0,0,0,0)"
                           onBackgroundClick={handleBgClick}
                           linkDirectionalParticles={2}
                           linkDirectionalParticleSpeed={0.005}
+                          showNavInfo={false}
                         />
                         <div className="absolute bottom-4 left-4 bg-white/80 dark:bg-gray-800/80 backdrop-blur-md p-3 rounded-lg shadow text-xs text-gray-500 dark:text-gray-400 z-20">
                           <div className="mb-1">• Click node to select</div>
@@ -251,21 +260,22 @@ export default function GraphPage() {
                   {selectedNode ? (
                     <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg overflow-hidden">
                       <div className="border-b border-gray-100 dark:border-gray-700 px-6 py-4 bg-gray-50 dark:bg-gray-800/80">
-                        <h3 className="text-lg font-semibold text-gray-800 dark:text-white flex items-center">
-                          <svg className="w-5 h-5 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
-                          </svg>
-                          Leaf Info
-                        </h3>
+                        <div className="flex items-center">
+                          <div className="flex space-x-2 mr-3">
+                            <div className="w-3 h-3 rounded-full bg-red-400"></div>
+                            <div className="w-3 h-3 rounded-full bg-yellow-400"></div>
+                            <div className="w-3 h-3 rounded-full bg-green-400"></div>
+                          </div>
+                          <span className="text-gray-500 dark:text-gray-400 text-sm font-medium">Leaf Details</span>
+                        </div>
                       </div>
-                      <div className="p-6">
+                      <div className="p-6 overflow-y-auto" style={{ maxHeight: "calc(65vh - 60px)" }}>
                         <h4 className="text-xl font-bold text-gray-800 dark:text-white mb-3">
                           {selectedNode.title}
                         </h4>
                         
                         {selectedNode.tags.length > 0 && (
-                          <div className="mt-4">
-                            <h5 className="text-sm font-medium text-gray-600 dark:text-gray-400 mb-2">Tags:</h5>
+                          <div className="mb-4">
                             <div className="flex flex-wrap gap-2">
                               {selectedNode.tags.map(tag => (
                                 <span key={tag} className="bg-emerald-100 dark:bg-emerald-900/30 text-emerald-800 dark:text-emerald-300 text-xs px-2 py-1 rounded-full">
@@ -276,16 +286,43 @@ export default function GraphPage() {
                           </div>
                         )}
                         
+                        <div className="prose dark:prose-invert max-w-none mb-6">
+                          <ReactMarkdown>{selectedNode.content}</ReactMarkdown>
+                        </div>
+                        
+                        {(selectedNode.forwardLinks?.length || selectedNode.backLinks?.length) && (
+                          <div className="mt-6 pt-4 border-t border-emerald-100 dark:border-emerald-800/50">
+                            <h3 className="text-md font-medium text-gray-700 dark:text-gray-300 mb-3">Connected Leaves</h3>
+                            <div className="space-y-2">
+                              {selectedNode.forwardLinks?.map(link => (
+                                <div key={link.id} className="flex items-center">
+                                  <svg className="w-4 h-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                                  </svg>
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">{link.title}</span>
+                                </div>
+                              ))}
+                              {selectedNode.backLinks?.map(link => (
+                                <div key={link.id} className="flex items-center">
+                                  <svg className="w-4 h-4 mr-2 text-emerald-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
+                                  </svg>
+                                  <span className="text-sm text-gray-600 dark:text-gray-400">{link.title}</span>
+                                </div>
+                              ))}
+                            </div>
+                          </div>
+                        )}
+                        
                         <div className="mt-6 pt-4 border-t border-gray-100 dark:border-gray-700">
                           <Link 
                             href={`/leaf/${selectedNode.id}`} 
-                            className="bg-emerald-50 dark:bg-emerald-900/20 hover:bg-emerald-100 dark:hover:bg-emerald-900/30 text-emerald-700 dark:text-emerald-300 w-full py-2 px-4 rounded-lg font-medium transition-colors duration-200 flex items-center justify-center"
+                            className="bg-emerald-600 hover:bg-emerald-700 text-white py-2 px-4 rounded-lg shadow-md hover:shadow-lg transition-all duration-300 flex items-center justify-center"
                           >
-                            <svg className="w-4 h-4 mr-2" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
-                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M2.458 12C3.732 7.943 7.523 5 12 5c4.478 0 8.268 2.943 9.542 7-1.274 4.057-5.064 7-9.542 7-4.477 0-8.268-2.943-9.542-7z" />
+                            <svg className="w-4 h-4 mr-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z" />
                             </svg>
-                            View Leaf
+                            Edit
                           </Link>
                         </div>
                       </div>
@@ -343,12 +380,6 @@ export default function GraphPage() {
                       Graph Tips
                     </h3>
                     <ul className="space-y-2 text-gray-600 dark:text-gray-300">
-                      <li className="flex items-start">
-                        <svg className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                        </svg>
-                        <span className="text-sm">The size of each node represents its importance in your knowledge network</span>
-                      </li>
                       <li className="flex items-start">
                         <svg className="w-5 h-5 mr-2 text-emerald-500 flex-shrink-0 mt-0.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
