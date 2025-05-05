@@ -168,18 +168,10 @@ cd frontend
 npm run test:coverage
 ```
 
-## Roadmap
+## Connect
 
-I'm actively working on enhancing Loreleaf with these upcoming features:
-
-- 🔄 Bidirectional linking
-- 📱 Mobile app version
-- 🧠 AI-assisted connections and insights
-- 🌐 Optional public sharing of knowledge gardens
-
-## Connect & Contribute
-
-I'd love to hear your thoughts or see your contributions! Feel free to open an issue or submit a pull request.
+Got thoughts, feedback, or just want to say hey?  
+Shoot me an email at [khizaraamir2004@gmail.com](mailto:khizaraamir2004@gmail.com) — I’d love to hear from you!
 
 ## License
 
