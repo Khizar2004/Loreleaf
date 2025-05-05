@@ -71,10 +71,8 @@ export default function CollectionsPage() {
       // Process each collection and add to backend
       for (const collection of localCollections) {
         try {
-          // Handle old format with criteria object or new format with direct properties
           const collectionData = {
             name: collection.name,
-            // Handle both formats for backward compatibility
             tags: collection.tags || (collection.criteria && collection.criteria.tags) || [],
             searchTerm: collection.searchTerm || (collection.criteria && collection.criteria.search) || undefined,
             createdAfter: collection.createdAfter || (collection.criteria && collection.criteria.createdAfter) || undefined,

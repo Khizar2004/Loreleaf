@@ -5,7 +5,6 @@ export const generateToken = (res: Response, userId: string): void => {
   const jwtSecret = process.env.JWT_SECRET || 'fallback-secret-key-for-development';
   const jwtExpiresIn = process.env.JWT_EXPIRES_IN || '7d';
 
-  // Create token with simpler approach
   const token = jwt.sign({ id: userId }, jwtSecret, {
     expiresIn: jwtExpiresIn,
   } as jwt.SignOptions);

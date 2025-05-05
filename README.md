@@ -1,13 +1,19 @@
 # Loreleaf 🍃
 
-Loreleaf is a personal knowledge management system that helps you organize your thoughts and ideas as interconnected "leaves" of knowledge.
+Welcome to Loreleaf - my passion project for personal knowledge management. Born from a desire to organize thoughts in a more natural, interconnected way, Loreleaf helps you cultivate your ideas as a beautiful garden of knowledge.
+
+## Why I Built This
+
+As someone who's always collecting ideas, notes, and insights, I found traditional note-taking too linear. Our thoughts don't exist in isolation - they connect and form networks. Loreleaf embraces this natural way of thinking, allowing your knowledge to grow organically like interconnected leaves on a tree.
 
 ## Features
 
-- Create, edit, delete, and link knowledge "leaves"
-- Organize leaves with tags
-- Visualize your knowledge graph to see connections
-- User authentication and personal knowledge space
+- 🌱 Create atomic "leaves" of knowledge with Markdown support
+- 🔗 Build connections between related ideas
+- 🔍 Discover insights through your personal knowledge graph
+- 🏷️ Organize with tags and collections
+- 📊 Visualize connections with an interactive knowledge graph
+- 🔐 Secure user authentication
 
 ## Tech Stack
 
@@ -15,6 +21,46 @@ Loreleaf is a personal knowledge management system that helps you organize your 
 - **Frontend**: Next.js, React, Tailwind CSS
 - **Authentication**: JWT
 - **Testing**: Jest, React Testing Library, Supertest
+
+## UI Showcase
+
+<details>
+<summary>📸 Home Page</summary>
+
+![Home Page - Top](frontend/public/images/homePage1.png)
+![Home Page - Features](frontend/public/images/homePage2.png)
+</details>
+
+<details>
+<summary>📸 About Page</summary>
+
+![About Page](frontend/public/images/aboutPage.png)
+</details>
+
+<details>
+<summary>📸 Dashboard</summary>
+
+![Dashboard View](frontend/public/images/dashboard.png)
+</details>
+
+<details>
+<summary>📸 Knowledge Graph</summary>
+
+![Knowledge Graph View](frontend/public/images/graphPage.png)
+</details>
+
+<details>
+<summary>📸 Timeline View</summary>
+
+![Timeline View](frontend/public/images/timelinePage.png)
+</details>
+
+<details>
+<summary>📸 Collections</summary>
+
+![Creating Collections](frontend/public/images/creatingCollection.png)
+![Created Collection](frontend/public/images/createdCollecion.png)
+</details>
 
 ## Getting Started
 
@@ -122,6 +168,23 @@ cd frontend
 npm run test:coverage
 ```
 
+## Roadmap
+
+I'm actively working on enhancing Loreleaf with these upcoming features:
+
+- 🔄 Bidirectional linking
+- 📱 Mobile app version
+- 🧠 AI-assisted connections and insights
+- 🌐 Optional public sharing of knowledge gardens
+
+## Connect & Contribute
+
+I'd love to hear your thoughts or see your contributions! Feel free to open an issue or submit a pull request.
+
 ## License
 
-This project is licensed under the MIT License. 
+This project is licensed under the MIT License.
+
+---
+
+Made with 💚 by [Khizar](https://github.com/Khizar2004) 
