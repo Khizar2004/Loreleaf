@@ -179,4 +179,6 @@ This project is licensed under the MIT License.
 
 ---
 
-Made with 💚 by [Khizar](https://github.com/Khizar2004) 
+<p align="center">
+  Built with ❤️ by [Khizar](https://github.com/Khizar2004)
+</p>
