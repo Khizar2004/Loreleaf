@@ -186,10 +186,6 @@ npm run test:coverage
 Got thoughts, feedback, or just want to say hey?  
 Shoot me an email at [khizaraamir2004@gmail.com](mailto:khizaraamir2004@gmail.com) — I’d love to hear from you!
 
-## License
-
-This project is licensed under the MIT License.
-
 ---
 
 <p align="center">
