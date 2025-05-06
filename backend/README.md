@@ -1,82 +1,77 @@
 # Loreleaf Backend
 
-This is the backend for Loreleaf, a personal knowledge management system inspired by Zettelkasten and digital gardens.
+*For general project overview, setup, and features, see the [root README](../README.md).*
 
-## Technologies
+## Backend-Specific Details
 
-- Node.js with Express
-- TypeScript
-- PostgreSQL with Prisma ORM
-- JWT Authentication
-- Zod for validation
+### Core Technologies
 
-## Features
+- Express 5.x API
+- Prisma ORM with PostgreSQL
+- JWT authentication with HTTP-only cookies
+- Zod for request validation
 
-- User authentication (register/login)
-- CRUD operations for Leaves (notes)
-- Automatic backlinking between leaves
-- Knowledge graph API
-- Advanced filtering and search
-- Analytics endpoints
-
-## Quick Start
-
-1. Install dependencies:
-   ```
-   npm install
-   ```
-
-2. Set up environment variables:
-   ```
-   DATABASE_URL="postgresql://username:password@localhost:5432/loreleaf?schema=public"
-   JWT_SECRET="your-secret-key-here"
-   JWT_EXPIRES_IN="7d"
-   PORT=8000
-   NODE_ENV="development"
-   ```
-
-3. Run database setup:
-   ```
-   npm run prisma:migrate
-   npm run prisma:generate
-   ```
-
-4. Start development server:
-   ```
-   npm run dev
-   ```
-
-## Project Structure
+### Directory Structure
 
 ```
 backend/
 ├── src/
-│   ├── controllers/       # Request handlers
-│   ├── middleware/        # Express middleware
+│   ├── controllers/       # Request handlers (auth, leaf, graph)
+│   ├── middleware/        # Express middleware (auth, validation)
 │   ├── routes/            # API routes
 │   ├── services/          # Business logic
-│   ├── utils/             # Utility functions
+│   ├── utils/             # Helper functions
 │   ├── __tests__/         # Test files
-│   └── server.ts          # Express app
+│   └── server.ts          # Express app entry point
 ├── prisma/
 │   ├── schema.prisma      # Database schema
 └── package.json
 ```
 
-## Key API Endpoints
+### API Documentation
 
-### Auth
+#### Authentication
 - `POST /api/auth/register` - Register new user
+  - Body: `{ email: string, password: string, name?: string }`
 - `POST /api/auth/login` - Login and get token
+  - Body: `{ email: string, password: string }`
+- `POST /api/auth/logout` - Logout (clear cookie)
 - `GET /api/auth/me` - Get current user info
 
-### Leaves
-- `GET /api/leaves` - List leaves (with filtering)
+#### Leaves (Notes)
+- `GET /api/leaves` - List leaves with filtering
+  - Query params: `tags`, `search`, `startDate`, `endDate`
 - `POST /api/leaves` - Create leaf
+  - Body: `{ title: string, content: string, tags?: string[], linkedLeafIds?: string[] }`
 - `GET /api/leaves/:id` - Get specific leaf
 - `PUT /api/leaves/:id` - Update leaf
 - `DELETE /api/leaves/:id` - Delete leaf
+- `POST /api/leaves/:id/link` - Link leaf to others
+  - Body: `{ targetLeafIds: string[] }`
 
-### Graph
+#### Knowledge Graph
 - `GET /api/graph` - Get knowledge graph data
-- `GET /api/graph/analytics` - Get analytics data 
+- `GET /api/graph/analytics` - Get analytics data
+
+#### Collections
+- `GET /api/collections` - List user collections
+- `POST /api/collections` - Create collection
+- `GET /api/collections/:id` - Get collection
+- `PUT /api/collections/:id` - Update collection
+- `DELETE /api/collections/:id` - Delete collection
+
+### Backend-Only Commands
+
+```bash
+# Run backend only
+npm run dev
+
+# Generate Prisma client
+npm run prisma:generate
+
+# Run migrations
+npm run prisma:migrate
+
+# Run tests
+npm test
+``` 
